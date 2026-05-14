@@ -1,0 +1,7 @@
+# Core stack for lp5 notebooks (Boston, IMDB, disease CNN, stock LSTM)
+pandas
+numpy
+matplotlib
+scikit-learn
+tensorflow
+jupyter
