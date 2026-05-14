@@ -1,0 +1,1778 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LP5 Notebook Mission Map</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #090b10;
+      --panel: #11151d;
+      --panel-2: #171d28;
+      --line: #293241;
+      --text: #eff4ff;
+      --muted: #9da9ba;
+      --soft: #c9d3e3;
+      --danger: #f87171;
+      --good: #58d68d;
+      --warn: #f5c451;
+      --blue: #6fb6ff;
+      --pink: #ff7ab6;
+      --green: #76df9f;
+      --amber: #f9b65c;
+      --violet: #b69cff;
+      --shadow: 0 20px 70px rgba(0, 0, 0, 0.28);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background: var(--bg);
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(111, 182, 255, 0.16), transparent 26rem),
+        radial-gradient(circle at 82% 16%, rgba(255, 122, 182, 0.13), transparent 25rem),
+        linear-gradient(180deg, #0a0d13 0%, #090b10 48%, #0d1118 100%);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 44px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 22px;
+    }
+
+    .eyebrow {
+      margin: 0 0 6px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 4.4rem);
+      line-height: 0.96;
+      max-width: 780px;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      max-width: 760px;
+      margin: 14px 0 0;
+      color: var(--soft);
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 86px);
+      gap: 8px;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(17, 21, 29, 0.88);
+      box-shadow: var(--shadow);
+    }
+
+    .stat {
+      min-height: 62px;
+      padding: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 6px;
+      background: var(--panel-2);
+    }
+
+    .stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .stat strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 1.32rem;
+      line-height: 1;
+    }
+
+    .tabs {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin: 0 0 18px;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(9, 11, 16, 0.9);
+      backdrop-filter: blur(14px);
+    }
+
+    .tab {
+      min-height: 42px;
+      color: var(--soft);
+      border-radius: 6px;
+      background: transparent;
+      font-weight: 800;
+    }
+
+    .tab[aria-selected="true"] {
+      color: #061016;
+      background: var(--text);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(17, 21, 29, 0.84);
+      box-shadow: var(--shadow);
+      overflow: clip;
+    }
+
+    .panel-head {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .panel-head h2 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    .panel-head p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .panel-body {
+      padding: 16px;
+    }
+
+    .mission-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .mission-card {
+      position: relative;
+      min-height: 212px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--text);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015));
+      text-align: left;
+      overflow: hidden;
+    }
+
+    .mission-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--mission), transparent 56%);
+      opacity: 0.18;
+      pointer-events: none;
+    }
+
+    .mission-card > * {
+      position: relative;
+    }
+
+    .mission-card.active {
+      border-color: var(--mission);
+      box-shadow: 0 0 0 1px color-mix(in srgb, var(--mission) 55%, transparent);
+    }
+
+    .mission-icon {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      margin-bottom: 12px;
+      border: 1px solid color-mix(in srgb, var(--mission) 72%, #ffffff 12%);
+      border-radius: 8px;
+      color: #071018;
+      background: var(--mission);
+      font-size: 1.12rem;
+      font-weight: 900;
+    }
+
+    .mission-card h3 {
+      margin: 0 0 7px;
+      font-size: 1.05rem;
+    }
+
+    .mission-card p {
+      margin: 0;
+      color: var(--soft);
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+
+    .mission-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 12px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 4px 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      color: var(--soft);
+      background: rgba(255, 255, 255, 0.04);
+      font-size: 0.76rem;
+      font-weight: 800;
+    }
+
+    .progress-line {
+      width: 100%;
+      height: 8px;
+      margin-top: 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .progress-line span {
+      display: block;
+      height: 100%;
+      width: var(--progress);
+      border-radius: inherit;
+      background: var(--mission);
+      transition: width 0.2s ease;
+    }
+
+    .mission-detail {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 8px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 34px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      min-height: 58px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.025);
+    }
+
+    .step.locked {
+      opacity: 0.48;
+    }
+
+    .step.current {
+      border-color: var(--mission);
+      background: color-mix(in srgb, var(--mission) 10%, rgba(255, 255, 255, 0.025));
+    }
+
+    .step-number {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 8px;
+      color: #051018;
+      background: var(--mission);
+      font-weight: 900;
+    }
+
+    .step h4 {
+      margin: 0;
+      font-size: 0.92rem;
+    }
+
+    .step p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.35;
+    }
+
+    .status-dot {
+      display: grid;
+      width: 28px;
+      height: 28px;
+      place-items: center;
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.06);
+      font-size: 0.78rem;
+      font-weight: 900;
+    }
+
+    .status-dot.done {
+      color: #06130c;
+      background: var(--good);
+    }
+
+    .challenge {
+      display: grid;
+      gap: 14px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-2);
+    }
+
+    .prompt {
+      margin: 0;
+      font-size: 1.22rem;
+      line-height: 1.35;
+      font-weight: 850;
+    }
+
+    .prompt small {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .answers {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .answer,
+    .control,
+    .mini-button {
+      min-height: 44px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+      text-align: left;
+      font-weight: 800;
+    }
+
+    .answer:hover,
+    .control:hover,
+    .mini-button:hover,
+    .order-card:hover {
+      border-color: var(--soft);
+      background: rgba(255, 255, 255, 0.075);
+    }
+
+    .answer.correct,
+    .choice.correct {
+      border-color: var(--good);
+      background: rgba(88, 214, 141, 0.16);
+    }
+
+    .answer.wrong,
+    .choice.wrong {
+      border-color: var(--danger);
+      background: rgba(248, 113, 113, 0.14);
+    }
+
+    .feedback {
+      min-height: 58px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--soft);
+      background: rgba(0, 0, 0, 0.16);
+      line-height: 1.45;
+    }
+
+    .feedback.good {
+      border-color: rgba(88, 214, 141, 0.46);
+    }
+
+    .feedback.bad {
+      border-color: rgba(248, 113, 113, 0.46);
+    }
+
+    .mode-grid {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 14px;
+    }
+
+    .side {
+      display: grid;
+      align-content: start;
+      gap: 8px;
+    }
+
+    .select-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .select-button {
+      min-height: 48px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--soft);
+      background: rgba(255, 255, 255, 0.035);
+      text-align: left;
+      font-weight: 850;
+    }
+
+    .select-button.active {
+      color: #071018;
+      border-color: var(--mission);
+      background: var(--mission);
+    }
+
+    .sequence-board {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 12px;
+    }
+
+    .stack {
+      min-height: 240px;
+      padding: 10px;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.12);
+    }
+
+    .stack h3 {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+    }
+
+    .order-card {
+      display: block;
+      width: 100%;
+      min-height: 48px;
+      margin-bottom: 8px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.045);
+      text-align: left;
+      font-weight: 800;
+    }
+
+    .order-card small {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-weight: 650;
+      line-height: 1.35;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .control {
+      text-align: center;
+      min-width: 116px;
+    }
+
+    .control.primary {
+      color: #061018;
+      border-color: var(--text);
+      background: var(--text);
+    }
+
+    .control.danger {
+      color: #1a0707;
+      border-color: var(--danger);
+      background: var(--danger);
+    }
+
+    .duel-card {
+      display: grid;
+      gap: 12px;
+      min-height: 330px;
+    }
+
+    .notebook-choices {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .choice {
+      min-height: 112px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+      text-align: left;
+    }
+
+    .choice strong,
+    .choice span {
+      display: block;
+    }
+
+    .choice strong {
+      margin-bottom: 6px;
+      font-size: 0.96rem;
+    }
+
+    .choice span {
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.35;
+    }
+
+    .weak-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .weak-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    .weak-item h3 {
+      margin: 0;
+      font-size: 0.92rem;
+    }
+
+    .weak-item p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.4;
+    }
+
+    .count {
+      display: grid;
+      min-width: 42px;
+      height: 34px;
+      place-items: center;
+      border-radius: 8px;
+      color: #1c1000;
+      background: var(--warn);
+      font-weight: 900;
+    }
+
+    .empty {
+      min-height: 180px;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      color: var(--muted);
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.025);
+      text-align: center;
+    }
+
+    .kbd {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      padding: 1px 6px;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      color: var(--soft);
+      background: rgba(255, 255, 255, 0.04);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    @media (max-width: 980px) {
+      .topbar,
+      .mission-detail,
+      .mode-grid,
+      .sequence-board {
+        grid-template-columns: 1fr;
+      }
+
+      .stats,
+      .mission-grid,
+      .notebook-choices {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .app {
+        width: min(100% - 20px, 1180px);
+        padding-top: 18px;
+      }
+
+      .tabs,
+      .answers,
+      .stats,
+      .mission-grid,
+      .notebook-choices {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        gap: 12px;
+      }
+
+      .panel-head {
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">LP5 Deep Learning Assignments</p>
+        <h1>Notebook Mission Map</h1>
+        <p class="subtitle">Four missions. Four pipelines. Master the order, spot the differences, and keep weak facts coming back until they stick.</p>
+      </div>
+      <section class="stats" aria-label="Progress stats">
+        <div class="stat"><span>Score</span><strong id="scoreStat">0</strong></div>
+        <div class="stat"><span>Streak</span><strong id="streakStat">0</strong></div>
+        <div class="stat"><span>Missions</span><strong id="missionStat">0/4</strong></div>
+        <div class="stat"><span>Weak</span><strong id="weakStat">0</strong></div>
+      </section>
+    </header>
+
+    <nav class="tabs" aria-label="Game modes">
+      <button class="tab" data-mode="map" aria-selected="true">Mission Map</button>
+      <button class="tab" data-mode="sequence" aria-selected="false">Sequence</button>
+      <button class="tab" data-mode="duel" aria-selected="false">Difference Duel</button>
+      <button class="tab" data-mode="params" aria-selected="false">Model Params</button>
+      <button class="tab" data-mode="weak" aria-selected="false">Weak Review</button>
+    </nav>
+
+    <section id="modeRoot" class="layout" aria-live="polite"></section>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "lp5-notebook-mission-map-v1";
+
+    const missions = [
+      {
+        id: "boston",
+        notebook: "1_Boston.ipynb",
+        title: "Boston Housing",
+        icon: "B",
+        color: "#6fb6ff",
+        role: "Tabular regression",
+        dataset: "HousingData.csv",
+        model: "Dense(64) -> Dense(32) -> Dense(1)",
+        output: "Numeric house price",
+        memoryHook: "CSV table, MEDV target, StandardScaler, regression metrics.",
+        steps: [
+          {
+            title: "Load Dataset",
+            detail: "Read HousingData.csv. MEDV is the price target.",
+            check: "What is the target column in the Boston notebook?",
+            correct: "MEDV",
+            distractors: ["Open", "sentiment", "class_name"],
+            explain: "Boston predicts MEDV, the median house value. Stock predicts Open price; IMDB predicts sentiment; disease predicts plant class."
+          },
+          {
+            title: "Prepare Features and Labels",
+            detail: "Drop MEDV into X, keep MEDV as y, fill missing values with column means.",
+            check: "What special data-cleaning step appears in Boston?",
+            correct: "Fill missing feature values with column means",
+            distractors: ["Pad reviews to length 200", "Augment images", "Create 5-day windows"],
+            explain: "Boston has tabular missing values, so it fills feature NaNs. The other notebooks use text padding, image augmentation, or time windows."
+          },
+          {
+            title: "Feature Scaling",
+            detail: "Use StandardScaler with fit_transform on train and transform on test.",
+            check: "Which scaler belongs to Boston?",
+            correct: "StandardScaler",
+            distractors: ["MinMaxScaler", "ImageDataGenerator", "pad_sequences"],
+            explain: "Boston standardizes tabular features. Stock uses MinMaxScaler for prices."
+          },
+          {
+            title: "Build Dense Regression Model",
+            detail: "Stack Dense hidden layers with ReLU and a final Dense(1) output.",
+            check: "Why does Boston end with Dense(1) and no activation?",
+            correct: "It predicts a continuous numeric value",
+            distractors: ["It predicts 38 image classes", "It predicts positive or negative sentiment", "It predicts the next word"],
+            explain: "Boston is regression, so the output is one unrestricted number."
+          },
+          {
+            title: "Train the Model",
+            detail: "Fit for 100 epochs with batch size 16 and validation_split=0.2.",
+            check: "Which training setup matches Boston?",
+            correct: "epochs=100, batch_size=16, validation_split=0.2",
+            distractors: ["epochs=10, batch_size=4", "validation_data=valid_data", "batch_size=128 for padded reviews"],
+            explain: "Boston trains a small dense model longer. Stock uses tiny LSTM batches; disease uses validation_data; IMDB uses larger review batches."
+          },
+          {
+            title: "Evaluate and Visualise",
+            detail: "Compute MSE, RMSE, R2, then plot actual vs predicted prices.",
+            check: "Which metric set belongs to Boston?",
+            correct: "MSE, RMSE, and R2",
+            distractors: ["Accuracy only", "Categorical accuracy and loss curves", "Real vs predicted stock price line"],
+            explain: "Boston is regression, so MSE/RMSE/R2 are natural. Classification notebooks focus on accuracy."
+          }
+        ]
+      },
+      {
+        id: "imdb",
+        notebook: "2_IMDB.ipynb",
+        title: "IMDB Sentiment",
+        icon: "I",
+        color: "#ff7ab6",
+        role: "Text classification",
+        dataset: "Keras IMDB dataset",
+        model: "Embedding -> Flatten -> Dense -> Dropout -> Dense(1)",
+        output: "Positive or negative review",
+        memoryHook: "Pre-tokenised reviews, pad to 200, embedding, sigmoid sentiment.",
+        steps: [
+          {
+            title: "Load IMDB Dataset",
+            detail: "Use tensorflow.keras.datasets.imdb with num_words=10000.",
+            check: "What makes the IMDB dataset different before preprocessing?",
+            correct: "Reviews are already tokenised as integer word indexes",
+            distractors: ["Images are stored in class folders", "Rows contain missing numeric values", "Prices must stay in time order"],
+            explain: "IMDB is text, already converted to word indexes by Keras."
+          },
+          {
+            title: "Pad Sequences",
+            detail: "Use pad_sequences so every review has max_length=200.",
+            check: "Why does IMDB pad sequences?",
+            correct: "Reviews have different lengths but the model needs fixed input length",
+            distractors: ["Images must become 128x128", "Prices must become 5-day windows", "Features must have mean 0 and std 1"],
+            explain: "Text reviews vary in length, so padding makes each sample the same shape."
+          },
+          {
+            title: "Build Embedding Model",
+            detail: "Embedding maps word ids to vectors, Flatten converts them for Dense layers.",
+            check: "Which layer is the signature of the IMDB notebook?",
+            correct: "Embedding",
+            distractors: ["Conv2D", "LSTM", "StandardScaler"],
+            explain: "Embedding is the text-specific layer. CNN is for images, LSTM is for sequences, StandardScaler is preprocessing."
+          },
+          {
+            title: "Train",
+            detail: "Fit with batch_size=128 and validation_split=0.2.",
+            check: "Which validation style does IMDB use?",
+            correct: "validation_split=0.2",
+            distractors: ["A separate valid image generator", "No validation at all", "The first 5 test days"],
+            explain: "IMDB and Boston use validation_split. Disease uses a separate validation folder."
+          },
+          {
+            title: "Evaluate",
+            detail: "Evaluate test loss and accuracy.",
+            check: "What is the main IMDB evaluation metric?",
+            correct: "Accuracy",
+            distractors: ["RMSE", "R2", "MinMax range"],
+            explain: "IMDB is binary classification, so accuracy is the headline metric."
+          },
+          {
+            title: "Predict Sample Reviews",
+            detail: "Predict first test reviews; probability above 0.5 means Positive.",
+            check: "What threshold turns IMDB output into a label?",
+            correct: "0.5",
+            distractors: ["5 days", "38 classes", "100 epochs"],
+            explain: "The final sigmoid probability above 0.5 is treated as positive sentiment."
+          },
+          {
+            title: "Plot Training Curves",
+            detail: "Plot training and validation accuracy across epochs.",
+            check: "What curve does IMDB focus on?",
+            correct: "Training vs validation accuracy",
+            distractors: ["Actual vs predicted house price", "Real vs predicted stock price", "Confusion between class folders"],
+            explain: "IMDB visualizes classification learning through accuracy curves."
+          }
+        ]
+      },
+      {
+        id: "disease",
+        notebook: "3_disease.ipynb",
+        title: "Plant Disease",
+        icon: "D",
+        color: "#76df9f",
+        role: "Image classification",
+        dataset: "Datasets/Assignment_3 folders",
+        model: "Conv2D blocks -> Flatten -> Dense -> Softmax",
+        output: "One of 38 plant classes",
+        memoryHook: "Folder images, augmentation, CNN, categorical crossentropy, save model.",
+        steps: [
+          {
+            title: "Define Dataset Paths",
+            detail: "Set train, valid, and test image folder paths.",
+            check: "How is the disease dataset organised?",
+            correct: "Images inside class-named folders",
+            distractors: ["A single CSV with MEDV", "Pre-tokenised review arrays", "A Google stock CSV"],
+            explain: "Disease classification uses folder names as labels."
+          },
+          {
+            title: "Image Preprocessing",
+            detail: "Use ImageDataGenerator with rescale plus training augmentation.",
+            check: "Which preprocessing belongs to disease?",
+            correct: "Rotation, zoom, flip, and rescale image pixels",
+            distractors: ["StandardScaler", "pad_sequences", "5-day sliding windows"],
+            explain: "Only the image notebook uses augmentation to create visual variety."
+          },
+          {
+            title: "Load Images from Folders",
+            detail: "Use flow_from_directory, resize to 128x128, and categorical labels.",
+            check: "Which API reads the disease images?",
+            correct: "flow_from_directory",
+            distractors: ["pd.read_csv", "imdb.load_data", "MinMaxScaler"],
+            explain: "flow_from_directory reads folder datasets and assigns labels from subfolders."
+          },
+          {
+            title: "Inspect Class Labels",
+            detail: "Print number of classes and class_indices.",
+            check: "How many classes does the disease notebook mention?",
+            correct: "38",
+            distractors: ["2", "1", "5"],
+            explain: "Disease predicts 38 plant species/disease classes."
+          },
+          {
+            title: "Build CNN Blocks",
+            detail: "Use Conv2D, MaxPooling2D, and Dropout blocks with more filters.",
+            check: "Which model block is disease-specific?",
+            correct: "Conv2D -> MaxPooling2D -> Dropout",
+            distractors: ["Embedding -> Flatten", "LSTM -> Dropout", "Dense(64) -> Dense(32)"],
+            explain: "CNN blocks are built for image feature extraction."
+          },
+          {
+            title: "Compile",
+            detail: "Use adam, categorical_crossentropy, and accuracy.",
+            check: "Which loss belongs to disease?",
+            correct: "categorical_crossentropy",
+            distractors: ["mean_squared_error", "binary_crossentropy idea", "R2 score"],
+            explain: "Disease is multi-class softmax classification, so categorical_crossentropy fits."
+          },
+          {
+            title: "Train",
+            detail: "Fit train_data with validation_data=valid_data for 10 epochs.",
+            check: "What validation source does disease use?",
+            correct: "A separate validation generator",
+            distractors: ["validation_split=0.2", "The last 20 percent of stock prices", "The test labels inside y_test"],
+            explain: "Disease has explicit train and valid folders."
+          },
+          {
+            title: "Save Model",
+            detail: "Save the trained CNN as plant_disease_cnn_model.keras.",
+            check: "Which notebook saves a model file?",
+            correct: "Plant Disease",
+            distractors: ["Boston Housing", "IMDB Sentiment", "Stock Prediction"],
+            explain: "The disease notebook includes a model.save step."
+          },
+          {
+            title: "Predict Test Images",
+            detail: "Predict test_data and use argmax to choose class labels.",
+            check: "Why does disease use argmax on predictions?",
+            correct: "To choose the highest-probability class",
+            distractors: ["To compute R2", "To undo MinMax scaling", "To pad reviews"],
+            explain: "Softmax returns class probabilities, and argmax picks the winning class."
+          },
+          {
+            title: "Plot Accuracy and Loss",
+            detail: "Plot train and validation accuracy, then train and validation loss.",
+            check: "Which notebook plots both accuracy and loss curves after saving?",
+            correct: "Plant Disease",
+            distractors: ["Boston Housing", "Stock Prediction", "Traversal C++"],
+            explain: "Disease plots both accuracy and loss histories after training."
+          }
+        ]
+      },
+      {
+        id: "stock",
+        notebook: "4_stock.ipynb",
+        title: "Google Stock",
+        icon: "S",
+        color: "#f9b65c",
+        role: "Time-series prediction",
+        dataset: "Datasets/google.csv",
+        model: "Stacked LSTM with Dropout",
+        output: "Next Open price",
+        memoryHook: "Open column, MinMaxScaler, 5-day windows, LSTM shape.",
+        steps: [
+          {
+            title: "Load Dataset",
+            detail: "Read Datasets/google.csv and predict the Open price.",
+            check: "Which column does the stock notebook predict?",
+            correct: "Open",
+            distractors: ["MEDV", "review sentiment", "class_indices"],
+            explain: "Stock uses the Open column as a univariate time series."
+          },
+          {
+            title: "Select, Split, and Scale",
+            detail: "Keep only Open, split by index, and scale with MinMaxScaler.",
+            check: "Why is the stock split not random?",
+            correct: "Time order must be preserved",
+            distractors: ["Images require class folders", "Reviews have unequal length", "Missing values must be averaged"],
+            explain: "Time series data must keep chronological order."
+          },
+          {
+            title: "Create Sliding Windows",
+            detail: "Use the past 5 days as input to predict the next day.",
+            check: "What is the stock timestep window?",
+            correct: "Past 5 days",
+            distractors: ["200 words", "128 by 128 pixels", "38 classes"],
+            explain: "The stock notebook turns prices into 5-day windows."
+          },
+          {
+            title: "Reshape for LSTM",
+            detail: "Shape data as samples, timesteps, features.",
+            check: "What shape does LSTM expect conceptually?",
+            correct: "samples, timesteps, features",
+            distractors: ["rows, columns only", "height, width, channels only", "word id, vocabulary only"],
+            explain: "LSTMs consume sequences, so the input has a time dimension."
+          },
+          {
+            title: "Build LSTM Model",
+            detail: "Stack LSTM layers with Dropout and Dense output.",
+            check: "Which model is stock-specific?",
+            correct: "LSTM",
+            distractors: ["Conv2D", "Embedding", "Dense-only regression"],
+            explain: "LSTM is used to learn patterns across time."
+          },
+          {
+            title: "Train",
+            detail: "Fit for 10 epochs with batch_size=4.",
+            check: "Which batch size belongs to stock?",
+            correct: "4",
+            distractors: ["16", "128", "One folder per class"],
+            explain: "Stock uses a small batch size of 4 in the notebook."
+          },
+          {
+            title: "Prepare Test Data and Predict",
+            detail: "Include 5 days before the test period, create windows, predict, and inverse transform.",
+            check: "Why does stock include data before the test period?",
+            correct: "To build the first 5-day test window",
+            distractors: ["To fill NaN values", "To learn word embeddings", "To get class folder names"],
+            explain: "The first test prediction needs the previous 5 days as context."
+          },
+          {
+            title: "Visualise Results",
+            detail: "Plot real stock price and predicted stock price.",
+            check: "What does the final stock plot compare?",
+            correct: "Real vs predicted stock price",
+            distractors: ["Training vs validation accuracy", "Actual vs predicted house price", "Class label indexes"],
+            explain: "The LSTM output is compared against real stock prices as two lines."
+          }
+        ]
+      }
+    ];
+
+    const duelQuestions = [
+      ["Which notebook uses StandardScaler?", "boston", "Boston scales tabular features with StandardScaler; stock uses MinMaxScaler."],
+      ["Which notebook pads every input to length 200?", "imdb", "IMDB review sequences are padded so text samples share one length."],
+      ["Which notebook uses ImageDataGenerator?", "disease", "Disease uses image generators for rescaling, augmentation, and folder loading."],
+      ["Which notebook creates 5-day sliding windows?", "stock", "Stock converts Open prices into windows of the previous 5 days."],
+      ["Which notebook predicts MEDV?", "boston", "MEDV is the Boston housing price target."],
+      ["Which notebook predicts positive or negative sentiment?", "imdb", "IMDB is the binary sentiment classifier."],
+      ["Which notebook has 38 output classes?", "disease", "Plant disease classification has 38 classes."],
+      ["Which notebook uses stacked LSTM layers?", "stock", "LSTM layers are the sequence model for stock prices."],
+      ["Which notebook saves plant_disease_cnn_model.keras?", "disease", "The disease notebook saves its CNN model after training."],
+      ["Which notebook evaluates with MSE, RMSE, and R2?", "boston", "Those are regression metrics used by Boston."],
+      ["Which notebook uses an Embedding layer?", "imdb", "Embedding maps IMDB word indexes into vectors."],
+      ["Which notebook must preserve chronological order during splitting?", "stock", "Stock is time-series data, so random splitting would leak future context."],
+      ["Which notebook uses categorical_crossentropy?", "disease", "Disease is multi-class classification with softmax output."],
+      ["Which notebook uses a final probability threshold of 0.5?", "imdb", "IMDB turns sigmoid output into Positive or Negative using 0.5."],
+      ["Which notebook fills missing values with column means?", "boston", "Boston has tabular missing values in the feature columns."]
+    ].map((q, index) => ({
+      id: `duel-${index}`,
+      prompt: q[0],
+      answer: q[1],
+      explanation: q[2],
+      type: "duel"
+    }));
+
+    const paramQuestions = [
+      ["Which exact Boston architecture is used?", "Dense(64, relu) -> Dense(32, relu) -> Dense(1)", ["Embedding(32) -> Flatten -> Dense(128) -> Dropout -> Dense(64) -> Dropout -> Dense(1)", "Conv2D 32/64/128 blocks -> Dense(128) -> softmax", "Five LSTM(50) layers -> Dense(1)"], "Boston is a simple dense regression network: two ReLU hidden layers, then one linear output neuron."],
+      ["What loss and metric does Boston compile with?", "mean_squared_error loss with mae metric", ["binary_crossentropy with accuracy", "categorical_crossentropy with accuracy", "mean_squared_error with no extra metric"], "Boston compiles with adam, mean_squared_error, and mae. It later reports MSE, RMSE, and R2 separately."],
+      ["What Boston training parameters are in model.fit?", "epochs=100, batch_size=16, validation_split=0.2", ["epochs=5, batch_size=128, validation_split=0.2", "epochs=10, validation_data=valid_data", "epochs=10, batch_size=4"], "Boston uses 100 epochs and batch size 16, which is the longest training loop among these notebooks."],
+      ["What is the IMDB embedding size?", "output_dim=32", ["output_dim=64", "units=50", "filters=128"], "IMDB turns each word index into a 32-dimensional learned vector before flattening."],
+      ["Which dense/dropout pattern belongs to IMDB?", "Dense(128, relu) -> Dropout(0.5) -> Dense(64, relu) -> Dropout(0.5) -> Dense(1, sigmoid)", ["Dense(64, relu) -> Dense(32, relu) -> Dense(1)", "Dense(128, relu) -> Dropout(0.5) -> Dense(38, softmax)", "Five LSTM(50) layers with Dropout(0.2)"], "IMDB has two dense ReLU layers with 50 percent dropout after each, then a sigmoid for binary sentiment."],
+      ["What loss does IMDB use?", "binary_crossentropy", ["categorical_crossentropy", "mean_squared_error", "r2_score"], "IMDB is binary classification with a sigmoid output, so binary_crossentropy is the matching loss."],
+      ["What IMDB training parameters are in model.fit?", "epochs=5, batch_size=128, validation_split=0.2", ["epochs=100, batch_size=16, validation_split=0.2", "epochs=10, batch_size=4", "epochs=10 with validation_data=valid_data"], "IMDB trains for 5 epochs with large batches of 128 padded reviews."],
+      ["Which Conv2D filter progression belongs to Disease?", "32 -> 64 -> 128", ["64 -> 32 -> 1", "50 -> 50 -> 50 -> 50 -> 50", "128 -> 64 -> 32"], "Disease uses three convolutional blocks whose filters double as features become more abstract."],
+      ["What dropout values does Disease use?", "0.25 in Conv blocks and 0.5 before softmax", ["0.5 after both Dense layers only", "0.2 after every LSTM", "No dropout"], "Disease uses moderate dropout inside CNN blocks, then stronger 0.5 dropout before the final classifier."],
+      ["What is Disease's final output layer?", "Dense(train_data.num_classes, activation='softmax')", ["Dense(1)", "Dense(1, activation='sigmoid')", "LSTM(units=50)"], "Disease predicts one of many plant classes, so it uses softmax over train_data.num_classes."],
+      ["What loss and validation style does Disease use?", "categorical_crossentropy with validation_data=valid_data", ["binary_crossentropy with validation_split=0.2", "mean_squared_error with batch_size=4", "mean_squared_error with mae"], "Disease is multi-class image classification and validates from a separate folder generator."],
+      ["How many LSTM layers are in the Stock model?", "5 LSTM layers", ["1 LSTM layer", "3 LSTM layers", "No LSTM layers"], "Stock stacks five LSTM layers, each with 50 units."],
+      ["What LSTM unit count is repeated in Stock?", "units=50", ["units=32", "units=128", "units=train_data.num_classes"], "Every Stock LSTM layer uses 50 units."],
+      ["Which return_sequences pattern belongs to Stock?", "True for the first four LSTMs, omitted on the last LSTM", ["False for every LSTM", "True only on the final LSTM", "Used on Dense layers"], "Stacked LSTMs pass sequences forward until the final LSTM outputs only the last step."],
+      ["What dropout and training batch size belong to Stock?", "Dropout(0.2), batch_size=4", ["Dropout(0.5), batch_size=128", "Dropout(0.25), no batch size", "No dropout, batch_size=16"], "Stock uses 20 percent dropout after each LSTM and a small batch size of 4."]
+    ].map((q, index) => ({
+      id: `param-${index}`,
+      prompt: q[0],
+      answer: q[1],
+      choices: [q[1], ...q[2]],
+      explanation: q[3],
+      type: "param"
+    }));
+
+    const missionById = Object.fromEntries(missions.map((mission) => [mission.id, mission]));
+    const allFacts = new Map();
+
+    missions.forEach((mission) => {
+      mission.steps.forEach((step, index) => {
+        step.id = `${mission.id}-step-${index}`;
+        step.missionId = mission.id;
+        step.stepIndex = index;
+        allFacts.set(step.id, {
+          id: step.id,
+          title: `${mission.title}: ${step.title}`,
+          prompt: step.check,
+          answer: step.correct,
+          choices: [step.correct, ...step.distractors],
+          explanation: step.explain,
+          missionId: mission.id,
+          type: "step"
+        });
+      });
+    });
+
+    duelQuestions.forEach((question) => {
+      allFacts.set(question.id, {
+        id: question.id,
+        title: question.prompt,
+        prompt: question.prompt,
+        answer: question.answer,
+        choices: missions.map((mission) => mission.id),
+        explanation: question.explanation,
+        type: "duel"
+      });
+    });
+
+    paramQuestions.forEach((question) => {
+      allFacts.set(question.id, {
+        id: question.id,
+        title: question.prompt,
+        prompt: question.prompt,
+        answer: question.answer,
+        choices: question.choices,
+        explanation: question.explanation,
+        type: "param"
+      });
+    });
+
+    const defaultState = {
+      score: 0,
+      streak: 0,
+      activeMode: "map",
+      activeMission: "boston",
+      sequenceMission: "boston",
+      completedSteps: {},
+      completedMissions: {},
+      wrongCounts: {},
+      sequenceSelected: [],
+      sequencePool: [],
+      currentDuelId: null,
+      currentParamId: null,
+      currentWeakId: null
+    };
+
+    let state = loadState();
+
+    const root = document.getElementById("modeRoot");
+    const scoreStat = document.getElementById("scoreStat");
+    const streakStat = document.getElementById("streakStat");
+    const missionStat = document.getElementById("missionStat");
+    const weakStat = document.getElementById("weakStat");
+
+    document.querySelectorAll(".tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        state.activeMode = tab.dataset.mode;
+        saveState();
+        render();
+      });
+    });
+
+    function loadState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        return normalizeState({ ...defaultState, ...saved });
+      } catch (error) {
+        return normalizeState({ ...defaultState });
+      }
+    }
+
+    function normalizeState(next) {
+      missions.forEach((mission) => {
+        if (!Array.isArray(next.completedSteps[mission.id])) {
+          next.completedSteps[mission.id] = [];
+        }
+      });
+      if (!next.sequencePool.length) {
+        resetSequencePool(next.sequenceMission, next);
+      }
+      return next;
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      renderStats();
+    }
+
+    function render() {
+      document.querySelectorAll(".tab").forEach((tab) => {
+        tab.setAttribute("aria-selected", String(tab.dataset.mode === state.activeMode));
+      });
+      renderStats();
+      if (state.activeMode === "map") renderMap();
+      if (state.activeMode === "sequence") renderSequence();
+      if (state.activeMode === "duel") renderDuel();
+      if (state.activeMode === "params") renderParams();
+      if (state.activeMode === "weak") renderWeak();
+    }
+
+    function renderStats() {
+      const weakTotal = Object.values(state.wrongCounts).filter((count) => count > 0).length;
+      const missionTotal = Object.values(state.completedMissions).filter(Boolean).length;
+      scoreStat.textContent = state.score;
+      streakStat.textContent = state.streak;
+      missionStat.textContent = `${missionTotal}/4`;
+      weakStat.textContent = weakTotal;
+    }
+
+    function renderMap() {
+      const active = missionById[state.activeMission];
+      root.innerHTML = `
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Mission Map</h2>
+              <p>Unlock each notebook pipeline in order.</p>
+            </div>
+            <button class="mini-button" id="resetProgress">Reset Progress</button>
+          </div>
+          <div class="panel-body">
+            <div class="mission-grid" id="missionGrid"></div>
+            <div class="mission-detail" style="--mission:${active.color}">
+              <div class="timeline" id="missionTimeline"></div>
+              <div class="challenge" id="stepChallenge"></div>
+            </div>
+          </div>
+        </section>
+      `;
+
+      document.getElementById("missionGrid").innerHTML = missions.map(renderMissionCard).join("");
+      document.querySelectorAll(".mission-card").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.activeMission = button.dataset.mission;
+          saveState();
+          renderMap();
+        });
+      });
+      document.getElementById("resetProgress").addEventListener("click", resetProgress);
+      renderMissionTimeline();
+      renderStepChallenge();
+    }
+
+    function renderMissionCard(mission) {
+      const completed = state.completedSteps[mission.id].length;
+      const total = mission.steps.length;
+      const progress = Math.round((completed / total) * 100);
+      const activeClass = state.activeMission === mission.id ? " active" : "";
+      return `
+        <button class="mission-card${activeClass}" data-mission="${mission.id}" style="--mission:${mission.color};--progress:${progress}%">
+          <span class="mission-icon">${mission.icon}</span>
+          <h3>${mission.title}</h3>
+          <p>${mission.memoryHook}</p>
+          <div class="mission-meta">
+            <span class="pill">${mission.role}</span>
+            <span class="pill">${completed}/${total}</span>
+          </div>
+          <div class="progress-line" aria-hidden="true"><span></span></div>
+        </button>
+      `;
+    }
+
+    function renderMissionTimeline() {
+      const mission = missionById[state.activeMission];
+      const completed = state.completedSteps[mission.id];
+      const currentIndex = Math.min(completed.length, mission.steps.length - 1);
+      document.getElementById("missionTimeline").innerHTML = mission.steps.map((step, index) => {
+        const isDone = completed.includes(index);
+        const isCurrent = index === currentIndex && !isDone;
+        const isLocked = index > completed.length;
+        return `
+          <article class="step ${isDone ? "" : "locked"} ${isCurrent ? "current" : ""}">
+            <span class="step-number">${index + 1}</span>
+            <div>
+              <h4>${step.title}</h4>
+              <p>${step.detail}</p>
+            </div>
+            <span class="status-dot ${isDone ? "done" : ""}">${isDone ? "OK" : isLocked ? "--" : "GO"}</span>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function renderStepChallenge() {
+      const mission = missionById[state.activeMission];
+      const completed = state.completedSteps[mission.id];
+      if (completed.length >= mission.steps.length) {
+        document.getElementById("stepChallenge").innerHTML = `
+          <p class="prompt">${mission.title} mission complete<small>${mission.notebook} is locked into memory.</small></p>
+          <div class="feedback good">${mission.memoryHook}</div>
+          <div class="controls">
+            <button class="control primary" id="jumpSequence">Practice Sequence</button>
+            <button class="control" id="jumpDuel">Difference Duel</button>
+          </div>
+        `;
+        document.getElementById("jumpSequence").addEventListener("click", () => {
+          state.activeMode = "sequence";
+          state.sequenceMission = mission.id;
+          resetSequencePool(mission.id);
+          saveState();
+          render();
+        });
+        document.getElementById("jumpDuel").addEventListener("click", () => {
+          state.activeMode = "duel";
+          saveState();
+          render();
+        });
+        return;
+      }
+
+      const step = mission.steps[completed.length];
+      const fact = allFacts.get(step.id);
+      document.getElementById("stepChallenge").innerHTML = `
+        <p class="prompt">${step.title}<small>${step.check}</small></p>
+        <div class="answers" id="stepAnswers">
+          ${shuffle([...fact.choices]).map((choice) => `<button class="answer" data-answer="${escapeAttr(choice)}">${choice}</button>`).join("")}
+        </div>
+        <div class="feedback" id="stepFeedback">Mission ${completed.length + 1} of ${mission.steps.length}: ${step.detail}</div>
+      `;
+      document.querySelectorAll("#stepAnswers .answer").forEach((button) => {
+        button.addEventListener("click", () => answerMissionStep(button, fact));
+      });
+    }
+
+    function answerMissionStep(button, fact) {
+      const mission = missionById[fact.missionId];
+      const chosen = button.dataset.answer;
+      const isCorrect = chosen === fact.answer;
+      const buttons = document.querySelectorAll("#stepAnswers .answer");
+      buttons.forEach((item) => {
+        item.disabled = true;
+        if (item.dataset.answer === fact.answer) item.classList.add("correct");
+        if (item === button && !isCorrect) item.classList.add("wrong");
+      });
+      recordAnswer(fact.id, isCorrect, isCorrect ? 12 : 0);
+      const feedback = document.getElementById("stepFeedback");
+      feedback.className = `feedback ${isCorrect ? "good" : "bad"}`;
+      feedback.textContent = fact.explanation;
+      if (isCorrect) {
+        const completed = state.completedSteps[mission.id];
+        if (!completed.includes(fact.stepIndex)) {
+          completed.push(fact.stepIndex);
+        }
+        if (completed.length === mission.steps.length) {
+          state.completedMissions[mission.id] = true;
+          state.score += 20;
+        }
+        saveState();
+        window.setTimeout(() => {
+          renderMissionTimeline();
+          renderStepChallenge();
+        }, 650);
+      } else {
+        saveState();
+      }
+    }
+
+    function renderSequence() {
+      const mission = missionById[state.sequenceMission];
+      root.innerHTML = `
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Sequence Challenge</h2>
+              <p>Build the notebook flow from first cell to final result.</p>
+            </div>
+            <span class="pill">${mission.notebook}</span>
+          </div>
+          <div class="panel-body mode-grid" style="--mission:${mission.color}">
+            <aside class="side">
+              <div class="select-list">
+                ${missions.map((item) => `
+                  <button class="select-button ${item.id === state.sequenceMission ? "active" : ""}" data-seq-mission="${item.id}" style="--mission:${item.color}">
+                    ${item.title}<br><span class="kbd">${item.role}</span>
+                  </button>
+                `).join("")}
+              </div>
+            </aside>
+            <section>
+              <div class="sequence-board">
+                <div class="stack">
+                  <h3>Step Pool</h3>
+                  <div id="sequencePool"></div>
+                </div>
+                <div class="stack">
+                  <h3>Your Order</h3>
+                  <div id="sequenceSelected"></div>
+                </div>
+              </div>
+              <div class="controls">
+                <button class="control primary" id="checkSequence">Check Order</button>
+                <button class="control" id="undoSequence">Undo</button>
+                <button class="control" id="resetSequence">Shuffle</button>
+              </div>
+              <div class="feedback" id="sequenceFeedback">Mission: ${mission.memoryHook}</div>
+            </section>
+          </div>
+        </section>
+      `;
+
+      document.querySelectorAll("[data-seq-mission]").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.sequenceMission = button.dataset.seqMission;
+          resetSequencePool(state.sequenceMission);
+          saveState();
+          renderSequence();
+        });
+      });
+      document.getElementById("checkSequence").addEventListener("click", checkSequence);
+      document.getElementById("undoSequence").addEventListener("click", undoSequence);
+      document.getElementById("resetSequence").addEventListener("click", () => {
+        resetSequencePool(state.sequenceMission);
+        saveState();
+        renderSequence();
+      });
+      renderSequenceStacks();
+    }
+
+    function renderSequenceStacks() {
+      const mission = missionById[state.sequenceMission];
+      document.getElementById("sequencePool").innerHTML = state.sequencePool.map((index) => {
+        const step = mission.steps[index];
+        return `<button class="order-card" data-pool-index="${index}">${step.title}<small>${step.detail}</small></button>`;
+      }).join("");
+      document.getElementById("sequenceSelected").innerHTML = state.sequenceSelected.map((index, slot) => {
+        const step = mission.steps[index];
+        return `<button class="order-card" data-selected-slot="${slot}">${slot + 1}. ${step.title}<small>${step.detail}</small></button>`;
+      }).join("");
+      document.querySelectorAll("[data-pool-index]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const index = Number(button.dataset.poolIndex);
+          state.sequencePool = state.sequencePool.filter((item) => item !== index);
+          state.sequenceSelected.push(index);
+          saveState();
+          renderSequenceStacks();
+        });
+      });
+      document.querySelectorAll("[data-selected-slot]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const slot = Number(button.dataset.selectedSlot);
+          const [index] = state.sequenceSelected.splice(slot, 1);
+          state.sequencePool.push(index);
+          saveState();
+          renderSequenceStacks();
+        });
+      });
+    }
+
+    function checkSequence() {
+      const mission = missionById[state.sequenceMission];
+      const feedback = document.getElementById("sequenceFeedback");
+      if (state.sequenceSelected.length !== mission.steps.length) {
+        feedback.className = "feedback bad";
+        feedback.textContent = `Place all ${mission.steps.length} steps before checking.`;
+        return;
+      }
+      const isCorrect = state.sequenceSelected.every((value, index) => value === index);
+      if (isCorrect) {
+        state.score += 30;
+        state.streak += 1;
+        feedback.className = "feedback good";
+        feedback.textContent = `${mission.title} sequence mastered: ${mission.steps.map((step) => step.title).join(" -> ")}.`;
+        state.sequenceSelected.forEach((stepIndex) => clearWeak(`${mission.id}-step-${stepIndex}`));
+      } else {
+        state.streak = 0;
+        const firstWrong = state.sequenceSelected.findIndex((value, index) => value !== index);
+        const expected = mission.steps[firstWrong].title;
+        const placed = mission.steps[state.sequenceSelected[firstWrong]].title;
+        addWeak(`${mission.id}-step-${firstWrong}`);
+        feedback.className = "feedback bad";
+        feedback.textContent = `First mismatch at slot ${firstWrong + 1}: expected "${expected}", but got "${placed}".`;
+      }
+      saveState();
+    }
+
+    function undoSequence() {
+      const index = state.sequenceSelected.pop();
+      if (typeof index === "number") {
+        state.sequencePool.unshift(index);
+        saveState();
+        renderSequenceStacks();
+      }
+    }
+
+    function resetSequencePool(missionId, targetState = state) {
+      const mission = missionById[missionId];
+      targetState.sequenceSelected = [];
+      targetState.sequencePool = shuffle(mission.steps.map((_, index) => index));
+    }
+
+    function renderDuel() {
+      if (!state.currentDuelId) {
+        state.currentDuelId = pickDuelQuestion().id;
+        saveState();
+      }
+      const question = allFacts.get(state.currentDuelId);
+      root.innerHTML = `
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Difference Duel</h2>
+              <p>Choose the notebook that owns the clue.</p>
+            </div>
+            <button class="mini-button" id="nextDuel">Next Clue</button>
+          </div>
+          <div class="panel-body duel-card">
+            <p class="prompt">${question.prompt}<small>Pick one notebook.</small></p>
+            <div class="notebook-choices" id="duelChoices">
+              ${missions.map((mission) => `
+                <button class="choice" data-answer="${mission.id}" style="--mission:${mission.color}">
+                  <strong>${mission.title}</strong>
+                  <span>${mission.role}</span>
+                  <span>${mission.model}</span>
+                </button>
+              `).join("")}
+            </div>
+            <div class="feedback" id="duelFeedback">Compare dataset, preprocessing, model, and output type.</div>
+          </div>
+        </section>
+      `;
+      document.getElementById("nextDuel").addEventListener("click", nextDuelQuestion);
+      document.querySelectorAll("#duelChoices .choice").forEach((button) => {
+        button.addEventListener("click", () => answerDuel(button, question));
+      });
+    }
+
+    function pickDuelQuestion() {
+      const weakDuel = duelQuestions.find((question) => state.wrongCounts[question.id] > 0);
+      if (weakDuel && Math.random() < 0.55) return weakDuel;
+      return duelQuestions[Math.floor(Math.random() * duelQuestions.length)];
+    }
+
+    function answerDuel(button, question) {
+      const chosen = button.dataset.answer;
+      const isCorrect = chosen === question.answer;
+      document.querySelectorAll("#duelChoices .choice").forEach((item) => {
+        item.disabled = true;
+        if (item.dataset.answer === question.answer) item.classList.add("correct");
+        if (item === button && !isCorrect) item.classList.add("wrong");
+      });
+      recordAnswer(question.id, isCorrect, isCorrect ? 10 : 0);
+      const feedback = document.getElementById("duelFeedback");
+      const answerMission = missionById[question.answer];
+      feedback.className = `feedback ${isCorrect ? "good" : "bad"}`;
+      feedback.textContent = `${question.explanation} Correct notebook: ${answerMission.title}.`;
+      saveState();
+    }
+
+    function nextDuelQuestion() {
+      state.currentDuelId = pickDuelQuestion().id;
+      saveState();
+      renderDuel();
+    }
+
+    function renderParams() {
+      if (!state.currentParamId) {
+        state.currentParamId = pickParamQuestion().id;
+        saveState();
+      }
+      const question = allFacts.get(state.currentParamId);
+      root.innerHTML = `
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Model Params</h2>
+              <p>Practice exact layers, activations, losses, dropout, epochs, and batch sizes.</p>
+            </div>
+            <button class="mini-button" id="nextParam">Next Parameter</button>
+          </div>
+          <div class="panel-body mode-grid">
+            <aside class="side">
+              <article class="challenge">
+                <p class="prompt">Quick map<small>Anchor the numbers to the notebook identity.</small></p>
+                <div class="weak-list">
+                  ${missions.map((mission) => `
+                    <div class="weak-item" style="--mission:${mission.color}">
+                      <span>
+                        <h3>${mission.title}</h3>
+                        <p>${mission.model}</p>
+                      </span>
+                      <span class="mission-icon">${mission.icon}</span>
+                    </div>
+                  `).join("")}
+                </div>
+              </article>
+            </aside>
+            <section class="challenge">
+              <p class="prompt">${question.prompt}<small>Choose the exact parameter set from the notebook.</small></p>
+              <div class="answers" id="paramAnswers">
+                ${shuffle([...question.choices]).map((choice) => `<button class="answer" data-answer="${escapeAttr(choice)}">${choice}</button>`).join("")}
+              </div>
+              <div class="feedback" id="paramFeedback">This mode drills the details that usually blur together: layer counts, activations, dropout, loss, epochs, and batch size.</div>
+            </section>
+          </div>
+        </section>
+      `;
+      document.getElementById("nextParam").addEventListener("click", nextParamQuestion);
+      document.querySelectorAll("#paramAnswers .answer").forEach((button) => {
+        button.addEventListener("click", () => answerParam(button, question));
+      });
+    }
+
+    function pickParamQuestion() {
+      const weakParam = paramQuestions.find((question) => state.wrongCounts[question.id] > 0);
+      if (weakParam && Math.random() < 0.6) return weakParam;
+      return paramQuestions[Math.floor(Math.random() * paramQuestions.length)];
+    }
+
+    function answerParam(button, question) {
+      const chosen = button.dataset.answer;
+      const isCorrect = chosen === question.answer;
+      document.querySelectorAll("#paramAnswers .answer").forEach((item) => {
+        item.disabled = true;
+        if (item.dataset.answer === question.answer) item.classList.add("correct");
+        if (item === button && !isCorrect) item.classList.add("wrong");
+      });
+      recordAnswer(question.id, isCorrect, isCorrect ? 12 : 0);
+      const feedback = document.getElementById("paramFeedback");
+      feedback.className = `feedback ${isCorrect ? "good" : "bad"}`;
+      feedback.textContent = question.explanation;
+      saveState();
+    }
+
+    function nextParamQuestion() {
+      state.currentParamId = pickParamQuestion().id;
+      saveState();
+      renderParams();
+    }
+
+    function renderWeak() {
+      const weakFacts = Object.entries(state.wrongCounts)
+        .filter(([, count]) => count > 0)
+        .sort((a, b) => b[1] - a[1])
+        .map(([id, count]) => ({ fact: allFacts.get(id), count }))
+        .filter((item) => item.fact);
+
+      if (!state.currentWeakId || !state.wrongCounts[state.currentWeakId]) {
+        state.currentWeakId = weakFacts[0] ? weakFacts[0].fact.id : null;
+        saveState();
+      }
+
+      const current = state.currentWeakId ? allFacts.get(state.currentWeakId) : null;
+      root.innerHTML = `
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Weak Review</h2>
+              <p>Wrong answers stay active until you clear them.</p>
+            </div>
+            <button class="mini-button" id="clearWeak">Clear Weak List</button>
+          </div>
+          <div class="panel-body mode-grid">
+            <aside class="weak-list" id="weakList">
+              ${weakFacts.length ? weakFacts.map(({ fact, count }) => `
+                <button class="weak-item" data-weak-id="${fact.id}">
+                  <span>
+                    <h3>${fact.title}</h3>
+                    <p>${fact.prompt}</p>
+                  </span>
+                  <span class="count">${count}</span>
+                </button>
+              `).join("") : `<div class="empty">No weak facts yet. Miss a clue and it will appear here.</div>`}
+            </aside>
+            <section class="challenge" id="weakChallenge">
+              ${current ? renderWeakQuestion(current) : `<div class="empty">All clear. Head to Mission Map or Difference Duel.</div>`}
+            </section>
+          </div>
+        </section>
+      `;
+      document.getElementById("clearWeak").addEventListener("click", () => {
+        state.wrongCounts = {};
+        state.currentWeakId = null;
+        saveState();
+        renderWeak();
+      });
+      document.querySelectorAll("[data-weak-id]").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.currentWeakId = button.dataset.weakId;
+          saveState();
+          renderWeak();
+        });
+      });
+      document.querySelectorAll("#weakAnswers .answer").forEach((button) => {
+        button.addEventListener("click", () => answerWeak(button, current));
+      });
+    }
+
+    function renderWeakQuestion(fact) {
+      if (fact.type === "duel") {
+        return `
+          <p class="prompt">${fact.prompt}<small>Choose the notebook.</small></p>
+          <div class="answers" id="weakAnswers">
+            ${missions.map((mission) => `<button class="answer" data-answer="${mission.id}">${mission.title}</button>`).join("")}
+          </div>
+          <div class="feedback" id="weakFeedback">${fact.explanation}</div>
+        `;
+      }
+      return `
+        <p class="prompt">${fact.prompt}<small>${fact.title}</small></p>
+        <div class="answers" id="weakAnswers">
+          ${shuffle([...fact.choices]).map((choice) => `<button class="answer" data-answer="${escapeAttr(choice)}">${choice}</button>`).join("")}
+        </div>
+        <div class="feedback" id="weakFeedback">${fact.explanation}</div>
+      `;
+    }
+
+    function answerWeak(button, fact) {
+      const chosen = button.dataset.answer;
+      const isCorrect = chosen === fact.answer;
+      document.querySelectorAll("#weakAnswers .answer").forEach((item) => {
+        item.disabled = true;
+        if (item.dataset.answer === fact.answer) item.classList.add("correct");
+        if (item === button && !isCorrect) item.classList.add("wrong");
+      });
+      recordAnswer(fact.id, isCorrect, isCorrect ? 15 : 0);
+      const feedback = document.getElementById("weakFeedback");
+      feedback.className = `feedback ${isCorrect ? "good" : "bad"}`;
+      feedback.textContent = isCorrect ? `Cleared one weak mark. ${fact.explanation}` : `Still weak. ${fact.explanation}`;
+      if (isCorrect) {
+        state.currentWeakId = pickNextWeakId(fact.id);
+      }
+      saveState();
+      window.setTimeout(renderWeak, isCorrect ? 700 : 0);
+    }
+
+    function pickNextWeakId(excludeId) {
+      const next = Object.entries(state.wrongCounts)
+        .filter(([id, count]) => id !== excludeId && count > 0)
+        .sort((a, b) => b[1] - a[1])[0];
+      return next ? next[0] : null;
+    }
+
+    function recordAnswer(factId, isCorrect, points) {
+      if (isCorrect) {
+        state.score += points;
+        state.streak += 1;
+        clearWeak(factId);
+      } else {
+        state.streak = 0;
+        addWeak(factId);
+      }
+    }
+
+    function addWeak(factId) {
+      state.wrongCounts[factId] = (state.wrongCounts[factId] || 0) + 1;
+    }
+
+    function clearWeak(factId) {
+      if (state.wrongCounts[factId]) {
+        state.wrongCounts[factId] -= 1;
+        if (state.wrongCounts[factId] <= 0) delete state.wrongCounts[factId];
+      }
+    }
+
+    function resetProgress() {
+      const keepMode = state.activeMode;
+      const keepMission = state.activeMission;
+      state = normalizeState({
+        ...structuredClone(defaultState),
+        activeMode: keepMode,
+        activeMission: keepMission
+      });
+      saveState();
+      render();
+    }
+
+    function shuffle(items) {
+      const copy = [...items];
+      for (let index = copy.length - 1; index > 0; index -= 1) {
+        const swapIndex = Math.floor(Math.random() * (index + 1));
+        [copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]];
+      }
+      return copy;
+    }
+
+    function escapeAttr(value) {
+      return String(value).replace(/"/g, "&quot;");
+    }
+
+    render();
+  </script>
+</body>
+</html>
